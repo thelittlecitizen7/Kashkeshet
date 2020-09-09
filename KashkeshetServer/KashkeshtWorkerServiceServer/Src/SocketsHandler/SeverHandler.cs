@@ -15,9 +15,6 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
     public class SeverHandler : ISeverHandler
     {
         public object locker = new object();
-        private List<ChatModule> _allChats;
-
-        private Dictionary<string, TcpClient> _allSockets;
 
         private TcpClient _client;
 
@@ -28,7 +25,7 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 
         public Thread ListenThread { get; set; }
 
-        private AllChatDetails _allChatDetails; 
+        private AllChatDetails _allChatDetails;
 
         public SeverHandler(TcpClient client, AllChatDetails allChatDetails)
         {
@@ -43,37 +40,21 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 
             if (!_allChatDetails.IsClientExist(name))
             {
-                _allChatDetails.AddClient(new ClientModel(name,_client));
-                
-            }
-            Console.WriteLine($"Client with name : {name} connected to server");
+                _userClient = new ClientModel(name, _client);
+                _allChatDetails.AddClient(_userClient);
+                var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
+                globalChat.AddClient(_userClient);
 
-            var clientName = GetClient(name);
-            
-            if (clientName != null)
-            {
-                if (!clientName.Connected)
-                {
-                    var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
-                    globalChat.RemoveClient(clientName);
-                    globalChat.AddClient(clientName);
-           
-                 }
-                
-                _userClient = clientName;
-                _userClient.Client = _client;
-                _userClient.Connected = true;
-                _userClient.LastStatusConnected = true;
             }
             else
             {
-                var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
-                _userClient = new ClientModel(name, _client);
-                globalChat.AddClient(_userClient);
+                _userClient = _allChatDetails.GetClientByName(name);
             }
-            //_userClient.CurrentConnectChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
+            Console.WriteLine($"Client with name : {name} connected to server");
 
-            //SendToAll($"user {_userClient.Name} connect to chat");
+            _userClient.Client = _client;
+            _userClient.Connected = true;
+            _userClient.LastStatusConnected = true;
 
 
             ListenThread = new Thread(() =>
@@ -83,11 +64,13 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
             ListenThread.Start();
         }
 
+
+
         public ClientModel GetClient(string name)
         {
             var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
             return globalChat.Clients.FirstOrDefault(s => s.Name == name);
-            
+
         }
         private void ListenReciveMesages()
         {
@@ -97,7 +80,7 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
                 {
                     string data = _responseHandler.GetResponse(_client);
 
-                    OperationExecuteFactory operationExecuteFactory = new OperationExecuteFactory(_userClient.Name,_allChatDetails);
+                    OperationExecuteFactory operationExecuteFactory = new OperationExecuteFactory(_userClient.Name, _allChatDetails);
 
                     operationExecuteFactory.Execute(data);
 
@@ -108,7 +91,6 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
                         CloseSocket();
                         break;
                     }
-                    //SendToAll(data);
 
                 }
                 catch (Exception e)
@@ -126,34 +108,5 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
             Console.WriteLine($"User {_userClient.Name} disconnected");
         }
 
-        private void SendToAllGlobal(string message)
-        {
-            var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
-            var allUserToSend = globalChat.Clients.Where(c => c.Name != _userClient.Name && c.Connected == true);
-
-            foreach (var client in allUserToSend)
-            {
-                if (client.Client.Connected)
-                {
-                    _requestHandler.SendData(client.Client, $"client  {_userClient.Name} : {message}");
-                }
-            }
-        }
-
-
-
-        private void SendToAll(string message)
-        {
-            var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
-            var allUserToSend = globalChat.Clients.Where(c => c.Name != _userClient.Name && c.Connected == true);
-            
-            foreach (var client in allUserToSend)
-            {
-                if (client.Client.Connected)
-                {
-                    _requestHandler.SendData(client.Client, $"client  {_userClient.Name} : {message}");
-                }
-            }
-        }
     }
 }

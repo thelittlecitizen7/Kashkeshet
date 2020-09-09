@@ -29,52 +29,48 @@ namespace KashkeshtWorkerServiceServer.Src.Factory
         public void Execute(string requestData)
         {
             var obj = Utils.DeSerlizeObject<MainRequest>(requestData);
-            switch (obj.RequestType.ToString())
+            switch (obj.RequestType)
             {
-                case "PrivateCreationChat":
+                case MessageType.PrivateCreationChat:
                     var request = Utils.DeSerlizeObject<PrivateChatMessageModel>(requestData);
                     new PrivateChatCreatorOption(Name, _allChatDetails).Operation(request);
                     break;
-                case "GetAllChats":
+                case MessageType.GetAllChats:
                     new GetAllChatOption(Name, _allChatDetails).Operation(obj);
                     break;
 
-                case "InsertToChat":
+                case MessageType.InsertToChat:
                     var request3 = Utils.DeSerlizeObject<InsertToChatMessageModel>(requestData);
                     //ConnectedToChat(requestData);
                     new InsertToChatOption(_allChatDetails).Operation(request3);
                     break;
 
-                case "UserChatStatus":
-                    var request4 = Utils.DeSerlizeObject<StatusClientMessage>(requestData);
-                    new InsertToChatOption(_allChatDetails).Operation(request4);
-                    break;
-                case "GetAllUserConnected":
+                case MessageType.GetAllUserConnected:
                     var request5 = Utils.DeSerlizeObject<MainRequest>(requestData);
                     new GetAllUserConnectedOption(Name, _allChatDetails).Operation(request5);
                     break;
-                case "GroupCreationChat":
+                case MessageType.GroupCreationChat:
                     var request6 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new GroupChatCreatorOption(Name, _allChatDetails).Operation(request6);
                     break;
 
-                case "AddUserToChat":
+                case MessageType.AddUserToChat:
                     var request7 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new AddUserToGroupOption(Name, _allChatDetails).Operation(request7);
                     break;
-                case "RemoveUserToChat":
+                case MessageType.RemoveUserToChat:
                     var request8 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new RemoveUserFromGroupOption(Name, _allChatDetails).Operation(request8);
                     break;
-                case "AddAdminPermissions":
+                case MessageType.AddAdminPermissions:
                     var request9 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new AddAdminPermissionOption(Name, _allChatDetails).Operation(request9);
                     break;
-                case "RemoveAdminPermissions":
+                case MessageType.RemoveAdminPermissions:
                     var request10 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new RemoveAdminPermissionOption(Name, _allChatDetails).Operation(request10);
                     break;
-                case "ExitChat":
+                case MessageType.ExitChat:
                     var request11 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new ExitChatOption(Name, _allChatDetails).Operation(request11);
                     break;//ExitChat
@@ -101,7 +97,7 @@ namespace KashkeshtWorkerServiceServer.Src.Factory
 
                 var model = new NewChatMessage
                 {
-                    RequestType = "NewChatMessage",
+                    RequestType = MessageType.NewChatMessage,
                     From = request.From,
                     Message = request.MessageChat
                 };
@@ -120,7 +116,7 @@ namespace KashkeshtWorkerServiceServer.Src.Factory
 
                 SendAll(foundChat, request, message);
 
-                foundChat.AddMessage(new MessageModel(MessageType.TextMessage, message, clientSneder, DateTime.Now));
+                foundChat.AddMessage(new MessageModel(ChatMessageType.TextMessage, message, clientSneder, DateTime.Now));
                 response = _responseHandler.GetResponse(_allChatDetails.GetClientByName(Name).Client);
             }
         }

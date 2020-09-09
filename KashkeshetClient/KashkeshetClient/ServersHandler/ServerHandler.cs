@@ -36,7 +36,7 @@ namespace KashkeshetClient.ServersHandler
 
         public string GetAllChats()
         {
-            var dataChat = new MainRequest { RequestType = "GetAllChats" };
+            var dataChat = new MainRequest { RequestType = MessageType.GetAllChats };
             string message = Utils.SerlizeObject(dataChat);
             _requestHandler.SendData(Client, message);
             var response = _responseHandler.GetResponse(Client);
@@ -45,9 +45,18 @@ namespace KashkeshetClient.ServersHandler
             return responserStr;
         }
 
+        public AllChatsMessage GetAllChatModels() 
+        {
+            var dataChat = new MainRequest { RequestType = MessageType.GetAllChats };
+            string message = Utils.SerlizeObject(dataChat);
+            _requestHandler.SendData(Client, message);
+            var response = _responseHandler.GetResponse(Client);
+            return Utils.DeSerlizeObject<AllChatsMessage>(response);
+        }
+
         public List<ChatMessageModel> GetAllChatGroupModels() 
         {
-            var dataChat = new MainRequest { RequestType = "GetAllChats" };
+            var dataChat = new MainRequest { RequestType = MessageType.GetAllChats };
             string message = Utils.SerlizeObject(dataChat);
             _requestHandler.SendData(Client, message);
             var response = _responseHandler.GetResponse(Client);
@@ -58,7 +67,7 @@ namespace KashkeshetClient.ServersHandler
 
         public string GetAllUserConnected()
         {
-            var dataChat = new MainRequest { RequestType = "GetAllUserConnected" };
+            var dataChat = new MainRequest { RequestType = MessageType.GetAllUserConnected};
             string message = Utils.SerlizeObject(dataChat);
             _requestHandler.SendData(Client, message);
             var response = _responseHandler.GetResponse(Client);
@@ -86,17 +95,30 @@ namespace KashkeshetClient.ServersHandler
         {
             var dataChat = new InsertToChatMessageModel
             {
-                RequestType = "InsertToChat",
+                RequestType = MessageType.InsertToChat,
                 ChatId = chatId,
                 From = Name
             };
 
-            Thread thread = new Thread(() => { ListenAnswerTCP(Client); });
-            thread.Start();
-
+            
 
             dataChat.MessageChat = $"User {Name} connected to chat";
             _requestHandler.SendData(Client, Utils.SerlizeObject(dataChat));
+
+            string data = _responseHandler.GetResponse(Client);
+            var successSwithChat = Utils.DeSerlizeObject<MainRequest>(data);
+
+            if (successSwithChat.RequestType == MessageType.ErrorResponse) 
+            {
+                var error = Utils.DeSerlizeObject<ErrorMessage>(data);
+                Console.WriteLine(error.Error);
+                return;
+            }
+            var successChat = Utils.DeSerlizeObject<OkResponseMessage>(data);
+            Console.WriteLine(successChat.Message);
+
+            Thread thread = new Thread(() => { ListenAnswerTCP(Client); });
+            thread.Start();
 
             while (true)
             {

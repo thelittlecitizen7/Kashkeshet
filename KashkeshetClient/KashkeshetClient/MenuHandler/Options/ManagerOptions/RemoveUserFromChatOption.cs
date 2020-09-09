@@ -1,4 +1,5 @@
 ﻿using KashkeshetClient.ServersHandler;
+using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using MenuBuilder.Options;
 using System;
@@ -67,7 +68,7 @@ namespace KashkeshetClient.MenuHandler.Options.ManagerOptions
 
             var body = new GroupChatMessageModel
             {
-                RequestType = "RemoveUserToChat",
+                RequestType = MessageType.RemoveUserToChat,
                 lsUsers = userNames,
                 GroupName = groupName
             };

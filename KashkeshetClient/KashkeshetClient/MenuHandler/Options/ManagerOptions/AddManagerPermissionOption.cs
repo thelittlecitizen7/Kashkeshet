@@ -1,5 +1,6 @@
 ﻿
 using KashkeshetClient.ServersHandler;
+using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using MenuBuilder.Options;
 using System;
@@ -70,7 +71,7 @@ namespace KashkeshetClient.MenuHandler.Options.ManagerOptions
 
             var body = new GroupChatMessageModel
             {
-                RequestType = "AddAdminPermissions",
+                RequestType = MessageType.AddAdminPermissions,
                 lsUsers = userNames,
                 GroupName = groupName
             };

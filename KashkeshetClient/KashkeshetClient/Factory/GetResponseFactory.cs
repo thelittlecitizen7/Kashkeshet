@@ -1,4 +1,5 @@
-﻿using KashkeshetCommon.Models.ChatData;
+﻿using KashkeshetCommon.Enum;
+using KashkeshetCommon.Models.ChatData;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,26 +11,26 @@ namespace KashkeshetClient.Factory
         public string GetResponse(string response)
         {
             var obj = Utils.DeSerlizeObject<MainRequest>(response);
-            switch (obj.RequestType.ToString())
+            switch (obj.RequestType)
             {
-                case "NewChatMessage":
+                case MessageType.NewChatMessage:
                     var model = Utils.DeSerlizeObject<NewChatMessage>(response);
                     return $"{DateTime.Now.ToString("MM/dd/yyyy")} : {model.From} sent : {model.Message} ";
-                case "UserStatus":
+                case MessageType.UserStatus:
                     var userStatusModel = Utils.DeSerlizeObject<StatusClientMessage>(response);
                     return $"{DateTime.Now.ToString("MM/dd/yyyy")} : {userStatusModel.From} {userStatusModel.StatusClient}";
-                case "GetAllChats":
+                case MessageType.GetAllChats:
                     var allChatsResponse = Utils.DeSerlizeObject<AllChatsMessage>(response);
                     return GetChatsResponse(allChatsResponse);
-                case "GetAllUserConnected":
+                case MessageType.GetAllUserConnected:
                     var allUsersResponse = Utils.DeSerlizeObject<AllUsersMessage>(response);
                     string allUsersStr = "";
                     allUsersResponse.Names.ForEach(n => allUsersStr += $"{n} {Environment.NewLine}");
                     return allUsersStr;
-                case "SuccessResponse":
+                case MessageType.SuccessResponse:
                     var successResponse = Utils.DeSerlizeObject<OkResponseMessage>(response);
                     return $"request Sucess : {successResponse.Message}";
-                case "ErrorResponse":
+                case MessageType.ErrorResponse:
                     var errorResponse = Utils.DeSerlizeObject<ErrorMessage>(response);
                     return $"request Failed : {errorResponse.Error}";
                 default:

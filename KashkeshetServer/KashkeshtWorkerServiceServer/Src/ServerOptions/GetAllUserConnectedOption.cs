@@ -1,4 +1,5 @@
-﻿using KashkeshetCommon.Models.ChatData;
+﻿using KashkeshetCommon.Enum;
+using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
 using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
@@ -30,7 +31,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             var body = new AllUsersMessage
             { 
                 From = _name,
-                RequestType = "GetAllUserConnected",
+                RequestType = MessageType.GetAllUserConnected,
                 Names = ls
             };
             var client = _allChatDetails.GetClientByName(_name).Client;

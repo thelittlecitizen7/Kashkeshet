@@ -1,4 +1,5 @@
-﻿using KashkeshetCommon.Models.ChatData;
+﻿using KashkeshetCommon.Enum;
+using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
 using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
@@ -31,7 +32,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions.ManagerOptions
             {
                 var errorBody = new ErrorMessage
                 {
-                    RequestType = "ErrorResponse",
+                    RequestType = MessageType.ErrorResponse,
                     Error = $"The user name {Name} cannot remove admin permission beacuse he has not permission"
                 };
                 _requestHandler.SendData(client.Client, Utils.SerlizeObject(errorBody));
@@ -41,7 +42,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions.ManagerOptions
             groupChat.RemoveMultiManagrs(alClientsToAdd);
             var successBody = new OkResponseMessage
             {
-                RequestType = "SuccessResponse",
+                RequestType = MessageType.SuccessResponse,
                 Message = $"Group {data.GroupName} users updated"
             };
             _requestHandler.SendData(client.Client, Utils.SerlizeObject(successBody));

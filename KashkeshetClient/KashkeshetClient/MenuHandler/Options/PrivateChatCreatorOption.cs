@@ -1,4 +1,5 @@
 ﻿using KashkeshetClient.ServersHandler;
+using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using MenuBuilder.Options;
 using System;
@@ -39,17 +40,12 @@ namespace KashkeshetClient.MenuHandler.Options
 
             var body = new PrivateChatMessageModel
             {
-                RequestType = "PrivateCreationChat",
+                RequestType = MessageType.PrivateCreationChat,
                 lsUsers = new List<string>() { name }
             };
 
             _serverHandler.CreateChat(body);
 
-        }
-
-        public bool IsUserExist(string name,List<string> Names) 
-        {
-            return Names.Any(n => n == name);
         }
     }
 }

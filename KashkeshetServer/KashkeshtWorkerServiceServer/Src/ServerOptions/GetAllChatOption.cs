@@ -1,4 +1,5 @@
-﻿using KashkeshetCommon.Models.ChatData;
+﻿using KashkeshetCommon.Enum;
+using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
@@ -28,7 +29,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
         {
             var allChatsMessageModel = new AllChatsMessage
             {
-                RequestType = "GetAllChats",
+                RequestType = MessageType.GetAllChats,
                 Chats = new List<ChatMessageModel>()
             };
             var allChats = _allChatDetails.GetAllChatThatClientExist(_name);

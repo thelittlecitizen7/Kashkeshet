@@ -6,7 +6,20 @@ namespace KashkeshetCommon.Enum
 {
     public enum MessageType
     {
-        Photo,
-        TextMessage
+        PrivateCreationChat,
+        GetAllChats,
+        InsertToChat,
+        UserChatStatus,
+        GetAllUserConnected,
+        GroupCreationChat,
+        AddUserToChat,
+        RemoveUserToChat,
+        AddAdminPermissions,
+        RemoveAdminPermissions,
+        ExitChat,
+        NewChatMessage,
+        UserStatus,
+        SuccessResponse,
+        ErrorResponse
     }
 }

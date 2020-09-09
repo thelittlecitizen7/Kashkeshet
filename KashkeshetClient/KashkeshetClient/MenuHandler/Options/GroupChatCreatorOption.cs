@@ -1,4 +1,5 @@
 ﻿using KashkeshetClient.ServersHandler;
+using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using MenuBuilder.Options;
 using System;
@@ -44,7 +45,7 @@ namespace KashkeshetClient.MenuHandler.Options
 
             var body = new GroupChatMessageModel
             {
-                RequestType = "GroupCreationChat",
+                RequestType = MessageType.GroupCreationChat,
                 lsUsers = userNames,
                 GroupName = groupName
             };

@@ -32,7 +32,8 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             {
                 if (_allChatDetails.IsClientExist(clientName))
                 {
-                    ClientModel client = new ClientModel(clientName, _allChatDetails.GetClientByName(clientName).Client);
+                    ClientModel client = _allChatDetails.GetClientByName(clientName);
+                    //ClientModel client = new ClientModel(clientName, _allChatDetails.GetClientByName(clientName).Client);
                     clients.Add(client);
                     newChat.AddClient(client);
                 }

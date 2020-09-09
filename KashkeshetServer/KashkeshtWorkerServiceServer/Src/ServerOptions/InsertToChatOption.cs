@@ -26,63 +26,106 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
 
         public void Operation(MainRequest request)
         {
+
             var data = request as InsertToChatMessageModel;
             ChatModule foundChat = _allChatDetails.GetChatById(data.ChatId);
             SendToAll(request, foundChat);
+
         }
 
         private void SendToAll(MainRequest request, ChatModule chat)
         {
+
             var data = request as InsertToChatMessageModel;
             var clientSneder = _allChatDetails.GetClientByName(data.From);
 
-            lock (locker)
+            if (!ValidateFirstConnectionToChat(clientSneder, chat, data)) 
             {
-                _allChatDetails.UpdateCurrentChat(clientSneder, chat);
-            }
-
-            var model = new NewChatMessage
-            {
-                RequestType = "NewChatMessage",
-                From = request.From,
-                Message = data.MessageChat
-            };
-            string message = Utils.SerlizeObject(model);
-            if (data.MessageChat == "exit")
-            {
-                model.Message = $"The user {data.From} disconnect from server";
-                SendToAll(chat, request, Utils.SerlizeObject(model));
-                model.Message = $"exit";
-                SendToAllExit(chat, request, Utils.SerlizeObject(model));
-
-                lock (locker)
-                {
-                    _allChatDetails.UpdateCurrentChat(clientSneder, null);
-                }
                 return;
             }
 
-            SendToAll(chat, request, message);
-
-
-            chat.AddMessage(new MessageModel(MessageType.TextMessage, message, clientSneder, DateTime.Now));
-
-        }
-        private void SendToAll(ChatModule chat, MainRequest request, string message)
-        {
-            var allUserToSend = GetAllConnectedToSend(chat, request);
-            foreach (var client in allUserToSend)
+            try
             {
-                if (client.Client.Connected)
+                lock (locker)
                 {
-                    _requestHandler.SendData(client.Client, message);
+                    _allChatDetails.UpdateCurrentChat(clientSneder, chat);
                 }
+
+                var model = new NewChatMessage
+                {
+                    RequestType = MessageType.NewChatMessage,
+                    From = request.From,
+                    Message = data.MessageChat
+                };
+                string message = Utils.SerlizeObject(model);
+                if (data.MessageChat == "exit")
+                {
+                    ExitFromChat(clientSneder, chat, request);
+                    return;
+                }
+
+                SendToAll(chat, request, message);
+
+
+                chat.AddMessage(new MessageModel(ChatMessageType.TextMessage, message, clientSneder, DateTime.Now));
+            }
+            catch (Exception e)
+            {
+                ExitFromChat(clientSneder, chat, request);
+                Console.WriteLine("Error" + e.Message);
             }
         }
 
-        private void SendToAllExit(ChatModule chat, MainRequest request, string message)
+        private bool ValidateFirstConnectionToChat(ClientModel clientSneder,ChatModule chat, InsertToChatMessageModel data)
         {
-            var allUserToSend = chat.Clients.Where(c => c.CurrentConnectChat != null).Where(g => g.Connected == true && g.CurrentConnectChat.ChatId == chat.ChatId);
+            if (clientSneder.CurrentConnectChat == null)
+            {
+                if (chat == null)
+                {
+                    var errorBody = new ErrorMessage
+                    {
+                        RequestType = MessageType.ErrorResponse,
+                        Error = $"There is not chat with id {data.ChatId}"
+                    };
+                    _requestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(errorBody));
+                    return false;
+                }
+                else
+                {
+                    var successBody = new OkResponseMessage
+                    {
+                        RequestType = MessageType.SuccessResponse,
+                        Message = $"user {data.From} in chat with {data.ChatId}"
+                    };
+                    _requestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(successBody));
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        private void ExitFromChat(ClientModel clientSneder, ChatModule chat, MainRequest request)
+        {
+            lock (locker)
+            {
+                _allChatDetails.UpdateCurrentChat(clientSneder, null);
+            }
+            var model = new NewChatMessage
+            {
+                RequestType = MessageType.NewChatMessage,
+                From = request.From
+            };
+
+            model.Message = $"The user {clientSneder.Name} disconnect from server";
+            SendToAll(chat, request, Utils.SerlizeObject(model));
+            model.Message = $"exit";
+            _requestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(model));
+        }
+
+
+        private void SendToAll(ChatModule chat, MainRequest request, string message)
+        {
+            var allUserToSend = GetAllConnectedToSend(chat, request);
             foreach (var client in allUserToSend)
             {
                 if (client.Client.Connected)
@@ -109,7 +152,6 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
 
                         }
                     }
-
                 }
             }
 
