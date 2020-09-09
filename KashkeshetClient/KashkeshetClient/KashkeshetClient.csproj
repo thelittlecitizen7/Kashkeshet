@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="KashkeshetCommon">
+      <HintPath>..\..\KashkeshetCommon\KashkeshetCommon\bin\Debug\netcoreapp3.1\KashkeshetCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="MenuBuilder">
+      <HintPath>..\..\..\..\Desktop\MenuBuilder.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
