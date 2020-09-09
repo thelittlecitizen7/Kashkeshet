@@ -73,92 +73,9 @@ namespace KashkeshtWorkerServiceServer.Src.Factory
                 case MessageType.ExitChat:
                     var request11 = Utils.DeSerlizeObject<GroupChatMessageModel>(requestData);
                     new ExitChatOption(Name, _allChatDetails).Operation(request11);
-                    break;//ExitChat
+                    break;
 
             }
         }
-
-        private void ConnectedToChat(string requestData)
-        {
-
-            string response = requestData;
-            InsertToChatMessageModel request = Utils.DeSerlizeObject<InsertToChatMessageModel>(response);
-            var clientSneder = _allChatDetails.GetClientByName(Name);
-            ChatModule foundChat = _allChatDetails.GetChatById(request.ChatId);
-            lock (locker)
-            {
-                _allChatDetails.UpdateCurrentChat(clientSneder, foundChat);
-            }
-            Console.WriteLine(clientSneder.CurrentConnectChat);
-
-            while (true)
-            {
-                request = Utils.DeSerlizeObject<InsertToChatMessageModel>(response);
-
-                var model = new NewChatMessage
-                {
-                    RequestType = MessageType.NewChatMessage,
-                    From = request.From,
-                    Message = request.MessageChat
-                };
-                string message = Utils.SerlizeObject(model);
-                if (request.MessageChat == "exit")
-                {
-                    lock (locker)
-                    {
-                        _allChatDetails.UpdateCurrentChat(clientSneder, null);
-                        //clientSneder.CurrentConnectChat = null;
-                    }
-                    model.Message = $"The user {model.From} disconnect from this chat";
-                    SendAll(foundChat, request, $"User");
-                    return;
-                }
-
-                SendAll(foundChat, request, message);
-
-                foundChat.AddMessage(new MessageModel(ChatMessageType.TextMessage, message, clientSneder, DateTime.Now));
-                response = _responseHandler.GetResponse(_allChatDetails.GetClientByName(Name).Client);
-            }
-        }
-
-        private void SendAll(ChatModule foundChat, InsertToChatMessageModel request, string message)
-        {
-            var allUserToSend = GetAllConnectedToSend(foundChat, request);
-
-            foreach (var client in allUserToSend)
-            {
-                if (client.Client.Connected)
-                {
-                    _requestHandler.SendData(client.Client, message);
-                }
-            }
-        }
-        private List<ClientModel> GetAllConnectedToSend(ChatModule chat, InsertToChatMessageModel request)
-        {
-            //var allUserToSend = chat.Clients.Where(c => c.Name != request.From && c.Connected == true && c.CurrentConnectChat.ChatId == chat.ChatId);
-            List<ClientModel> ls = new List<ClientModel>();
-            foreach (var client in chat.Clients)
-            {
-                if ((client.Name != request.From) && (client.Connected == true))
-                {
-                    if (client.CurrentConnectChat != null)
-                    {
-                        if (client.CurrentConnectChat.ChatId == chat.ChatId)
-                        {
-                            lock (locker)
-                            {
-                                ls.Add(client);
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            return ls;
-
-        }
-
-
     }
 }
