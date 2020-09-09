@@ -35,5 +35,8 @@ namespace KashkeshetCommon.Models.ChatData
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
 
         public List<string> Names { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<string> AdminUsersNames { get; set; }
     }
 }

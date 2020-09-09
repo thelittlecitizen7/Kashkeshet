@@ -19,8 +19,8 @@ namespace KashkeshetClient
                 SystemInput = new SystemInputHandler(),
                 SystemOutput = new SystemOutputHandler()
             };
-            Client client = new Client("127.0.0.1", 11111,containerInterfaces);
-             client.Connect();
+            Client client = new Client("127.0.0.1", 11111, containerInterfaces);
+            client.Connect();
 
         }
     }

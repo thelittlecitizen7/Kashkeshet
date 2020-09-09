@@ -20,13 +20,13 @@ namespace KashkeshetClient.ClientSocketHandler
     {
         public int Port { get; set; }
         public string Adress { get; set; }
-        public string Name { get; set; }
+
 
         private IUser _user;
 
         private IContainerInterfaces _containerInterfaces;
 
-        public Client(string adress, int port,IContainerInterfaces containerInterfaces)
+        public Client(string adress, int port, IContainerInterfaces containerInterfaces)
         {
             Adress = IPAddress.Parse(adress).ToString();
             Port = port;
@@ -38,19 +38,19 @@ namespace KashkeshetClient.ClientSocketHandler
         {
             _containerInterfaces.SystemOutput.Print("Please enter your Name");
             string name = Console.ReadLine();
-            Name = name;
-
 
             string hostname = Adress;
+
             var client = new TcpClient();
+
             client.Connect(hostname, Port);
 
-            _user = new User(name,client);
-            
+            _user = new User(name, client);
+
             _containerInterfaces.SystemOutput.Print("Socket connected to");
             _containerInterfaces.RequestHandler.SendData(client, name);
 
-            Menu menu = new Menu(_containerInterfaces,_user);
+            Menu menu = new Menu(_containerInterfaces, _user);
             menu.Run();
         }
 

@@ -20,6 +20,11 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             Managers = new List<ClientModel>();
         }
 
+        public List<string> GetAllManagersNames() 
+        {
+            return Managers.Select(m => m.Name).ToList();
+        }
+
         public void AddMultiClient(List<ClientModel> clients)
         {
             foreach (var client in clients)

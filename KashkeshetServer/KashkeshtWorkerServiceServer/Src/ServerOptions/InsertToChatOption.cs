@@ -126,14 +126,9 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
 
         private void SendToAll(ChatModule chat, MainRequest request, string message)
         {
+
             var allUserToSend = GetAllConnectedToSend(chat, request);
-            foreach (var client in allUserToSend)
-            {
-                if (client.Client.Connected)
-                {
-                    _requestHandler.SendData(client.Client, message);
-                }
-            }
+            _requestHandler.SendDataMultiClients(allUserToSend.Select(u => u.Client).ToList(),message);
         }
 
 

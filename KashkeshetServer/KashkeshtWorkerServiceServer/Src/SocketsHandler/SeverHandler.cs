@@ -14,7 +14,6 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 {
     public class SeverHandler : ISeverHandler
     {
-        public object locker = new object();
 
         private TcpClient _client;
 
@@ -22,8 +21,6 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
         private IServerResponseHandler _responseHandler;
 
         private ClientModel _userClient { get; set; }
-
-        public Thread ListenThread { get; set; }
 
         private AllChatDetails _allChatDetails;
 
@@ -35,6 +32,18 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
             _responseHandler = new ServerResponseHandler();
         }
         public void Run()
+        {
+
+            StartClientConnection();
+
+            Thread ListenThread = new Thread(() =>
+            {
+                ListenReciveMesages();
+            });
+            ListenThread.Start();
+        }
+
+        private void StartClientConnection()
         {
             string name = _responseHandler.GetResponse(_client);
 
@@ -54,24 +63,9 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 
             _userClient.Client = _client;
             _userClient.Connected = true;
-            _userClient.LastStatusConnected = true;
-
-
-            ListenThread = new Thread(() =>
-            {
-                ListenReciveMesages();
-            });
-            ListenThread.Start();
         }
 
 
-
-        public ClientModel GetClient(string name)
-        {
-            var globalChat = _allChatDetails.GetAllChatByType(ChatType.Globaly)[0];
-            return globalChat.Clients.FirstOrDefault(s => s.Name == name);
-
-        }
         private void ListenReciveMesages()
         {
             while (true)

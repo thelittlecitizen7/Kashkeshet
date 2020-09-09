@@ -8,5 +8,7 @@ namespace KashkeshtWorkerServiceServer.Src.RequestsHandler
     public interface IServerRequestHandler
     {
         void SendData(TcpClient client, string data);
+
+        void SendDataMultiClients(List<TcpClient> clients, string data);
     }
 }

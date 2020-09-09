@@ -5,6 +5,7 @@ using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
 using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
+using System;
 using System.Collections.Generic;
 
 namespace KashkeshtWorkerServiceServer.Src.ServerOptions
@@ -41,7 +42,8 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                     ChatId = chat.ChatId,
                     Names = chat.GetAllNamesInChat(),
                     ChatType = chat.ChatType,
-                    GroupName = (chat.GetType() == typeof(GroupChat)) ? ((GroupChat)chat).GroupName : null
+                    GroupName = (chat.GetType() == typeof(GroupChat)) ? ((GroupChat)chat).GroupName : null,
+                    AdminUsersNames = (chat.GetType() == typeof(GroupChat)) ? ((GroupChat)chat).GetAllManagersNames() : null
                 });
             }
             string msg = Utils.SerlizeObject(allChatsMessageModel);

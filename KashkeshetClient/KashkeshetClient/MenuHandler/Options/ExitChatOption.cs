@@ -25,7 +25,7 @@ namespace KashkeshetClient.MenuHandler.Options
         {
             _containerInterfaces.SystemOutput.Print("All chats group chats");
             List<ChatMessageModel> allChats = _serverHandler.GetAllChatGroupModels();
-            _containerInterfaces.SystemOutput.Print(_serverHandler.ParseChatsToString(allChats));
+            _containerInterfaces.SystemOutput.Print(ChatUtils.GetChatsResponse(allChats));
 
 
             _containerInterfaces.SystemOutput.Print("Please enter the group name you want to remove to | CLICK --stop for stop type OR exit for exit option-- EXIT");

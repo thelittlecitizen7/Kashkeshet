@@ -14,19 +14,17 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
         public ChatType ChatType { get; set; }
 
         public string ChatId { get; set; }
-        public Dictionary<ClientModel,int> MapNumberOfEntries { get; set; }
 
 
         public ChatModule(ChatType chatType)
         {
-            MapNumberOfEntries = new Dictionary<ClientModel, int>();
             ChatId = Guid.NewGuid().ToString();
             Clients = new List<ClientModel>();
             Messages = new List<MessageModel>();
             ChatType = chatType;
         }
 
-        public ClientModel GetClient(string name) 
+        public ClientModel GetClient(string name)
         {
             return Clients.FirstOrDefault(c => c.Name == name);
         }
@@ -40,7 +38,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
         }
 
 
-        public List<string> GetAllNamesInChat() 
+        public List<string> GetAllNamesInChat()
         {
             List<string> names = new List<string>();
             foreach (var user in Clients)
@@ -78,29 +76,9 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
             return Clients.Any(c => c.Name == name);
         }
 
-        public void GetInsideChat(ClientModel client) 
-        {
-            if (MapNumberOfEntries.ContainsKey(client))
-            {
-                MapNumberOfEntries[client]++;
-            }
-            else
-            {
-                MapNumberOfEntries.Add(client, 0);
-            }
-        }
 
-        public int GetAmountClinetConnection(ClientModel client) 
-        {
-            return MapNumberOfEntries[client];
-        }
 
-        public void SetAmountConnection(int value, ClientModel client) 
-        {
-            MapNumberOfEntries[client] = value;
-        }
-
-        public void AddMessage(MessageModel message) 
+        public void AddMessage(MessageModel message)
         {
             Messages.Add(message);
         }

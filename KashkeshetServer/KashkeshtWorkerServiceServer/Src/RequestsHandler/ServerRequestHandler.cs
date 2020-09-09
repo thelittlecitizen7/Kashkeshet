@@ -20,5 +20,17 @@ namespace KashkeshtWorkerServiceServer.Src.RequestsHandler
 
             nts.Write(Encoding.ASCII.GetBytes(inputBytesName), 0, inputBytesName.Length);
         }
+
+        public void SendDataMultiClients(List<TcpClient> clients, string data)
+        {
+
+            foreach (var client in clients)
+            {    
+                if (client.Connected)
+                {
+                    SendData(client, data);
+                }
+            }
+        }
     }
 }

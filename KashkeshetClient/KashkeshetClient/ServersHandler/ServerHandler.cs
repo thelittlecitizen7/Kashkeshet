@@ -14,39 +14,19 @@ namespace KashkeshetClient.ServersHandler
 {
     public class ServerHandler
     {
-        
-        
+
+        private GetResponseFactory _getResponseFactory;
         private IUser _user;
 
         private IContainerInterfaces _containerInterfaces;
         public ServerHandler(IContainerInterfaces containerInterfaces,IUser user)
         {
+            _getResponseFactory = new GetResponseFactory();
             _containerInterfaces = containerInterfaces;
             _user = user;
         }
 
-        public string ParseChatsToString(List<ChatMessageModel> chats)
-        {
-            string msg = "";
-            foreach (var chat in chats)
-            {
-                string memebersStr = "|";
-                foreach (var memeber in chat.Names)
-                {
-                    memebersStr += $" {memeber} |";
-                }
-                if (chat.GroupName != null)
-                {
-                    msg += $"{chat.ChatType.ToString()} with name {chat.GroupName} chat id : {chat.ChatId} , with memebers : {memebersStr} {Environment.NewLine}";
-                }
-                else
-                {
-                    msg += $"{chat.ChatType.ToString()} chat id : {chat.ChatId} , with memebers : {memebersStr} {Environment.NewLine}";
-                }
-            }
-            return msg;
-        }
-
+       
 
         public string GetAllChats()
         {

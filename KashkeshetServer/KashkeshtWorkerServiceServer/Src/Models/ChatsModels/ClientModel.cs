@@ -11,7 +11,6 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
 
         public TcpClient Client { get; set; }
 
-        public bool LastStatusConnected { get; set; }
         public bool Connected { get; set; }
 
         public ChatModule CurrentConnectChat { get; set; }
