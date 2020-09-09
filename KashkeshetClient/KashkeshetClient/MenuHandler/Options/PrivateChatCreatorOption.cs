@@ -1,4 +1,5 @@
-﻿using KashkeshetClient.ServersHandler;
+﻿using KashkeshetClient.Models;
+using KashkeshetClient.ServersHandler;
 using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using MenuBuilder.Options;
@@ -10,31 +11,33 @@ namespace KashkeshetClient.MenuHandler.Options
 {
     public class PrivateChatCreatorOption : IOptions
     {
+        private IContainerInterfaces _containerInterfaces;
         private ServerHandler _serverHandler;
         private string _clientname;
-        public PrivateChatCreatorOption(string name ,ServerHandler serverHandler)
+        public PrivateChatCreatorOption(IContainerInterfaces containerInterfaces, IUser _user, ServerHandler serverHandler)
         {
-            _clientname = name;
+            _clientname = _user.Name;
             _serverHandler = serverHandler;
+            _containerInterfaces = containerInterfaces;
         }
         public void Operation()
         {
-            Console.WriteLine("All connected users");
+            _containerInterfaces.SystemOutput.Print("All connected users");
             string allConnectedUser = _serverHandler.GetAllUserConnected();
-            Console.WriteLine(allConnectedUser);
+            _containerInterfaces.SystemOutput.Print(allConnectedUser);
 
-            Console.WriteLine("Please enter the name you want to open chat with him");
-            string name = Console.ReadLine();
+            _containerInterfaces.SystemOutput.Print("Please enter the name you want to open chat with him");
+            string name = _containerInterfaces.SystemInput.StringInput();
 
             if (name == _clientname) 
             {
-                Console.WriteLine($"You cannot create private chat with yourself");
+                _containerInterfaces.SystemOutput.Print($"You cannot create private chat with yourself");
                 return;
             }
 
             if (!allConnectedUser.Contains(name)) 
             {
-                Console.WriteLine($"The user {name} is not in user list");
+                _containerInterfaces.SystemOutput.Print($"The user {name} is not in user list");
                 return;
             }
 

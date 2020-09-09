@@ -1,4 +1,5 @@
-﻿using KashkeshetClient.ServersHandler;
+﻿using KashkeshetClient.Models;
+using KashkeshetClient.ServersHandler;
 using MenuBuilder.Options;
 using System;
 using System.Collections.Generic;
@@ -9,15 +10,19 @@ namespace KashkeshetClient.MenuHandler.Options
     public class GetAllChatOption : IOptions
     {
         private ServerHandler _serverHandler { get; set; }
-        public GetAllChatOption(ServerHandler serverHandler)
+
+        private IContainerInterfaces _containerInterfaces;
+
+        public GetAllChatOption(IContainerInterfaces containerInterfaces, ServerHandler serverHandler)
         {
             _serverHandler = serverHandler;
+            _containerInterfaces = containerInterfaces;
         }
         public void Operation()
         {
-            Console.WriteLine("All chats : ");
+            _containerInterfaces.SystemOutput.Print("All chats : ");
             string allChats = _serverHandler.GetAllChats();
-            Console.WriteLine(allChats);
+            _containerInterfaces.SystemOutput.Print(allChats);
         }
     }
 }

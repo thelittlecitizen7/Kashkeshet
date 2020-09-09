@@ -1,5 +1,9 @@
 ﻿using ClientChat;
+using KashkeshetClient.ClientRequestsHandler;
 using KashkeshetClient.MenuHandler;
+using KashkeshetClient.Models;
+using MenuBuilder;
+using MenuBuilder.IO.Input;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -12,69 +16,43 @@ using System.Threading;
 
 namespace KashkeshetClient.ClientSocketHandler
 {
-    public class Client
+    public class Client : IClient
     {
         public int Port { get; set; }
         public string Adress { get; set; }
         public string Name { get; set; }
-        private RequestHandler _requestHandler { get; set; }
 
-        private ResponseHandler _responseHandler { get; set; }
+        private IUser _user;
 
-        public Client(string adress, int port)
+        private IContainerInterfaces _containerInterfaces;
+
+        public Client(string adress, int port,IContainerInterfaces containerInterfaces)
         {
             Adress = IPAddress.Parse(adress).ToString();
             Port = port;
-            _requestHandler = new RequestHandler();
-            _responseHandler = new ResponseHandler();
+            _containerInterfaces = containerInterfaces;
         }
 
 
         public void Connect()
         {
-            Console.WriteLine("Please enter your Name");
+            _containerInterfaces.SystemOutput.Print("Please enter your Name");
             string name = Console.ReadLine();
             Name = name;
 
+
             string hostname = Adress;
             var client = new TcpClient();
-            client.Connect(hostname, Port);            
-            Console.WriteLine("Socket connected to");
-            _requestHandler.SendData(client, name);
+            client.Connect(hostname, Port);
 
-            Menu menu = new Menu();
-            menu.Run(Name,client);
+            _user = new User(name,client);
+            
+            _containerInterfaces.SystemOutput.Print("Socket connected to");
+            _containerInterfaces.RequestHandler.SendData(client, name);
 
-            while (true)
-            {
-                Thread thread = new Thread(() => { ListenAnswerTCP(client); });
-                thread.Start();
-
-                while (true)
-                {
-                    Console.WriteLine("Please enter Input");
-                    string input = Console.ReadLine();
-
-                    
-                    _requestHandler.SendData(client, input);
-                    Console.WriteLine($"You : {input}");
-                }
-            }
+            Menu menu = new Menu(_containerInterfaces,_user);
+            menu.Run();
         }
 
-
-
-        private void ListenAnswerTCP(TcpClient client)
-        {
-            while (true)
-            {
-                var response = _responseHandler.GetResponse(client);
-
-                if (response != null)
-                {
-                    Console.WriteLine($"from server : {response}");
-                }
-            }
-        }
     }
 }

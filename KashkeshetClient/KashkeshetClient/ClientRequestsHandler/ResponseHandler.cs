@@ -1,17 +1,14 @@
-﻿using System;
+﻿using KashkeshetClient.ClientRequestsHandler;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
 namespace ClientChat
 {
-    public class ResponseHandler
+    public class ResponseHandler : IResponseHandler
     {
         public object locker = new object();
-        public ResponseHandler()
-        {
-
-        }
 
         public string GetResponse(TcpClient client)
         {

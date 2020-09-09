@@ -1,5 +1,8 @@
-﻿using KashkeshetClient.MenuHandler.Options;
+﻿using KashkeshetClient.ClientRequestsHandler;
+using KashkeshetClient.IOSystem;
+using KashkeshetClient.MenuHandler.Options;
 using KashkeshetClient.MenuHandler.Options.ManagerOptions;
+using KashkeshetClient.Models;
 using KashkeshetClient.ServersHandler;
 using MenuBuilder;
 using MenuBuilder.IO.Input;
@@ -15,27 +18,31 @@ namespace KashkeshetClient.MenuHandler
 {
     public class Menu
     {
-        public void Run(string name, TcpClient client)
+        private IContainerInterfaces _containerInterfaces;
+
+        private IUser _user;
+        public Menu(IContainerInterfaces containerInterfaces , IUser user)
         {
-            IOutputSystem outputSystem = new ConsoleOutput();
-            ISystemInput systemInput = new SystemInput();
+            _containerInterfaces = containerInterfaces;
+            _user = user;
+        }
 
-            ServerHandler serverHandler = new ServerHandler(name, client);
-            IMenuBuilder managerMenuBuilder = new NumberMenuBuilder("Manager options : ", outputSystem, systemInput)
-            .AddOptions("Add user from group", new AddUserToChatOption(name, serverHandler))
-            .AddOptions("Remove user from group", new RemoveUserFromChatOption(name, serverHandler))
-            .AddOptions("Add user as admin", new AddManagerPermissionOption(name, serverHandler))
-            .AddOptions("Remove user as admin", new RemoveManagerPermissionOption(name, serverHandler));
+        public void Run()
+        {
+            ServerHandler serverHandler = new ServerHandler(_containerInterfaces,_user);
+            IMenuBuilder managerMenuBuilder = new NumberMenuBuilder("Manager options : ", _containerInterfaces.SystemOutput, _containerInterfaces.SystemInput)
+            .AddOptions("Add user from group", new AddUserToChatOption(_containerInterfaces, _user, serverHandler))
+            .AddOptions("Remove user from group", new RemoveUserFromChatOption(_containerInterfaces, _user, serverHandler))
+            .AddOptions("Add user as admin", new AddManagerPermissionOption(_containerInterfaces, _user, serverHandler))
+            .AddOptions("Remove user as admin", new RemoveManagerPermissionOption(_containerInterfaces, _user, serverHandler));
 
-
-
-            IMenu numberMenuBuilder = new NumberMenuBuilder("Chat options : ", outputSystem, systemInput).
-                AddOptions("Get All Chats", new GetAllChatOption(serverHandler)).
-                AddOptions("Create Private Chat", new PrivateChatCreatorOption(name, serverHandler)).
-                AddOptions("Create Group Chat", new GroupChatCreatorOption(name, serverHandler)).
+            IMenu numberMenuBuilder = new NumberMenuBuilder("Chat options : ", _containerInterfaces.SystemOutput, _containerInterfaces.SystemInput).
+                AddOptions("Get All Chats", new GetAllChatOption(_containerInterfaces,serverHandler)).
+                AddOptions("Create Private Chat", new PrivateChatCreatorOption(_containerInterfaces, _user, serverHandler)).
+                AddOptions("Create Group Chat", new GroupChatCreatorOption(_containerInterfaces, _user, serverHandler)).
                 AddOptions("Manager Options", new NavigateMenuOption(managerMenuBuilder.Build())).
-                AddOptions("Go into chat", new InsertToChatOption(serverHandler)).
-                AddOptions("Exit from Group", new ExitChatOption(name, serverHandler)).
+                AddOptions("Go into chat", new InsertToChatOption(_containerInterfaces,serverHandler)).
+                AddOptions("Exit from Group", new ExitChatOption(_containerInterfaces, _user, serverHandler)).
                 AddOptions("Exit from chat", new MenuExitOption())
                 .Build();
 
