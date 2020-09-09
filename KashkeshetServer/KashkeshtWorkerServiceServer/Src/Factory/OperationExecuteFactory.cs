@@ -1,4 +1,5 @@
-﻿using KashkeshetCommon.Enum;
+﻿using KashkeshetCommon;
+using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
@@ -41,7 +42,6 @@ namespace KashkeshtWorkerServiceServer.Src.Factory
 
                 case MessageType.InsertToChat:
                     var request3 = Utils.DeSerlizeObject<InsertToChatMessageModel>(requestData);
-                    //ConnectedToChat(requestData);
                     new InsertToChatOption(_allChatDetails).Operation(request3);
                     break;
 

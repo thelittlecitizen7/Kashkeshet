@@ -1,13 +1,12 @@
 ﻿using ClientChat;
 using KashkeshetClient.Factory;
+using KashkeshetCommon;
 using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
-using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace KashkeshetClient.ServersHandler
@@ -139,8 +138,6 @@ namespace KashkeshetClient.ServersHandler
         {
             while (true)
             {
-               
-
                 string response = _responseHandler.GetResponse(client);
 
                 if (response != null)
