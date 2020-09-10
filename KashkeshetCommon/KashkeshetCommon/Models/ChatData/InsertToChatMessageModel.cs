@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using KashkeshetCommon.Enum;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,9 @@ namespace KashkeshetCommon.Models.ChatData
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
 
         public string MessageChat { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public ChatMessageType MessageType { get; set; }
 
     }
 }

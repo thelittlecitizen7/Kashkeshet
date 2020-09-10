@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace KashkeshtWorkerServiceServer.Src.RequestsHandler
 {
@@ -23,13 +24,17 @@ namespace KashkeshtWorkerServiceServer.Src.RequestsHandler
 
         public void SendDataMultiClients(List<TcpClient> clients, string data)
         {
-
             foreach (var client in clients)
-            {    
-                if (client.Connected)
+            {
+                Thread thread = new Thread(() => 
                 {
-                    SendData(client, data);
-                }
+                    if (client.Connected)
+                    {
+                        SendData(client, data);
+                    }
+                });
+                thread.Start();
+                
             }
         }
     }

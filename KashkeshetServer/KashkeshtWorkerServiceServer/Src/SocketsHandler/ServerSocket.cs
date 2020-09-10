@@ -43,10 +43,10 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
                 _containerInterfaces.Logger.LogInformation("Server Start listen");
                 while (true)
                 {
-                    
+                    TcpClient client = Listener.AcceptTcpClient();
                     Thread thread = new Thread(() =>
                     {
-                        TcpClient client = Listener.AcceptTcpClient();
+                        
                         SeverHandler socketHandler = new SeverHandler(client, AllChatDetails,_containerInterfaces);
                         socketHandler.Run();
                     });

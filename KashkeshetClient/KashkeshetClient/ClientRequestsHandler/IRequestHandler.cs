@@ -8,5 +8,6 @@ namespace KashkeshetClient.ClientRequestsHandler
     public interface IRequestHandler
     {
         void SendData(TcpClient client, string data);
+
     }
 }

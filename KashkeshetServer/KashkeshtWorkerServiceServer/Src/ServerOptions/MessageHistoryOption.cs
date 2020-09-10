@@ -33,6 +33,16 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
 
             var chat = _allChatDetails.GetChatById(data.ChatId);
 
+            if (chat == null) {
+                var errorBody = new ErrorMessage
+                {
+                    RequestType = MessageType.ErrorResponse,
+                    Error = $"The chat with id {data.ChatId} not found"
+                };
+                _containerInterfaces.RequestHandler.SendData(_userClient.Client, Utils.SerlizeObject(errorBody));
+                return;
+            }
+
             List<MessageDetails> messages = new List<MessageDetails>();
             foreach (var message in chat.Messages)
             {

@@ -15,7 +15,6 @@ namespace KashkeshetClient.Factory
         {
 
             var obj = Utils.DeSerlizeObject<MainRequest>(response);
-            Console.WriteLine(obj.RequestType);
             switch (obj.RequestType)
             {
                 case MessageType.NewChatMessage:
@@ -39,7 +38,6 @@ namespace KashkeshetClient.Factory
                     var errorResponse = Utils.DeSerlizeObject<ErrorMessage>(response);
                     return $"request Failed : {errorResponse.Error}";
                 case MessageType.HistoryChatMessages:
-
                     var chatMessageHistory = Utils.DeSerlizeObject<ChatMessageHistory>(response);
                     string msg = "";
                     chatMessageHistory.AllMessages.ToList().ForEach(m => msg += $"{m.Datetime.ToString("MM/dd/yyyy")} : {m.SenderName} sent : {m.Message} {Environment.NewLine}");

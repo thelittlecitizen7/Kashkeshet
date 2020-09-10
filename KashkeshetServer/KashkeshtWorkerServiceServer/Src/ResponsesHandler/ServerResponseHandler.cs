@@ -14,7 +14,7 @@ namespace KashkeshtWorkerServiceServer.Src.ResponsesHandler
         {
             NetworkStream nwStream = client.GetStream();
             byte[] buffer = new byte[client.ReceiveBufferSize];
-
+            
             int bytesRead = nwStream.Read(buffer, 0, client.ReceiveBufferSize);
 
             string data = Encoding.ASCII.GetString(buffer, 0, bytesRead);

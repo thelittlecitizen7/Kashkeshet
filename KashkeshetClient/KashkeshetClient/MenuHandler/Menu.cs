@@ -21,6 +21,9 @@ namespace KashkeshetClient.MenuHandler
         private IContainerInterfaces _containerInterfaces;
 
         private IUser _user;
+
+
+
         public Menu(IContainerInterfaces containerInterfaces , IUser user)
         {
             _containerInterfaces = containerInterfaces;
@@ -42,6 +45,7 @@ namespace KashkeshetClient.MenuHandler
                 AddOptions("Create Group Chat", new GroupChatCreatorOption(_containerInterfaces, _user, serverHandler)).
                 AddOptions("Manager Options", new NavigateMenuOption(managerMenuBuilder.Build())).
                 AddOptions("Go into chat", new InsertToChatOption(_containerInterfaces,serverHandler)).
+                AddOptions("Execute commands", new CommandRequestOption(_containerInterfaces, serverHandler)).
                 AddOptions("Exit from Group", new ExitChatOption(_containerInterfaces, _user, serverHandler)).
                 AddOptions("Exit from chat", new MenuExitOption())
                 .Build();

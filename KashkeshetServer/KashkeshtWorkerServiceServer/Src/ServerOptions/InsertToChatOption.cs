@@ -18,7 +18,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
         private AllChatDetails _allChatDetails { get; set; }
 
         public IContainerInterfaces _containerInterfaces { get; set; }
-        public InsertToChatOption(AllChatDetails allChatDetails , IContainerInterfaces containerInterfaces)
+        public InsertToChatOption(AllChatDetails allChatDetails, IContainerInterfaces containerInterfaces)
         {
             _containerInterfaces = containerInterfaces;
             _allChatDetails = allChatDetails;
@@ -39,7 +39,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             var data = request as InsertToChatMessageModel;
             var clientSneder = _allChatDetails.GetClientByName(data.From);
 
-            if (!ValidateFirstConnectionToChat(clientSneder, chat, data)) 
+            if (!ValidateFirstConnectionToChat(clientSneder, chat, data))
             {
                 return;
             }
@@ -51,6 +51,8 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                     _allChatDetails.UpdateCurrentChat(clientSneder, chat);
                 }
 
+
+
                 var model = new NewChatMessage
                 {
                     RequestType = MessageType.NewChatMessage,
@@ -59,12 +61,15 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                 };
                 string message = Utils.SerlizeObject(model);
                 if (data.MessageChat == "exit")
-                {   
+                {
                     ExitFromChat(clientSneder, chat, request);
                     return;
                 }
 
-                SendToAll(chat, request, message);
+                
+                 SendToAll(chat, request, message);
+
+
 
 
                 chat.AddMessage(new MessageModel(ChatMessageType.TextMessage, data.MessageChat, clientSneder, DateTime.Now));
@@ -75,7 +80,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             }
         }
 
-        private bool ValidateFirstConnectionToChat(IClientModel clientSneder,ChatModule chat, InsertToChatMessageModel data)
+        private bool ValidateFirstConnectionToChat(IClientModel clientSneder, ChatModule chat, InsertToChatMessageModel data)
         {
             if (clientSneder.CurrentConnectChat == null)
             {
@@ -126,9 +131,8 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
 
         private void SendToAll(ChatModule chat, MainRequest request, string message)
         {
-
             var allUserToSend = GetAllConnectedToSend(chat, request);
-            _containerInterfaces.RequestHandler.SendDataMultiClients(allUserToSend.Select(u => u.Client).ToList(),message);
+            _containerInterfaces.RequestHandler.SendDataMultiClients(allUserToSend.Select(u => u.Client).ToList(), message);
         }
 
 

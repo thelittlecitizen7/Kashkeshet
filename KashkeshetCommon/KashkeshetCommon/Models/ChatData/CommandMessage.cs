@@ -1,5 +1,4 @@
-﻿using KashkeshetCommon.Enum;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,10 +6,9 @@ using System.Text;
 namespace KashkeshetCommon.Models.ChatData
 {
     [Serializable]
-    public class NewChatMessage : MainRequest
+    public class CommandMessage : MainRequest
     {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string Message { get; set; }
-
+        public string Command { get; set; }
     }
 }

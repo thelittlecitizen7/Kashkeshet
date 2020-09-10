@@ -21,6 +21,8 @@ namespace KashkeshetCommon.Enum
         UserStatus,
         SuccessResponse,
         ErrorResponse,
-        HistoryChatMessages
+        HistoryChatMessages,
+        CommandMessage,
+        AllCommandMessage
     }
 }

@@ -6,6 +6,7 @@ using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
@@ -17,14 +18,35 @@ namespace KashkeshetClient.ServersHandler
         private IUser _user;
 
         private IContainerInterfaces _containerInterfaces;
-        public ServerHandler(IContainerInterfaces containerInterfaces,IUser user)
+        public ServerHandler(IContainerInterfaces containerInterfaces, IUser user)
         {
-            
+
             _containerInterfaces = containerInterfaces;
             _user = user;
         }
 
-       
+        public string SendCommand(string command)
+        {
+            var dataChat = new CommandMessage { RequestType = MessageType.CommandMessage, Command = command, From = _user.Name };
+            string message = Utils.SerlizeObject(dataChat);
+            _containerInterfaces.RequestHandler.SendData(_user.Client, message);
+
+            var transactionResponseStr = _containerInterfaces.ResponseHandler.GetResponse(_user.Client);
+            var transactionResponse = new GetResponseFactory().GetResponse(transactionResponseStr);
+
+            _containerInterfaces.SystemOutput.Print(transactionResponse);
+
+            var enumValueNumber = (int)MessageType.ErrorResponse;
+            if (transactionResponseStr.Contains(enumValueNumber.ToString())) 
+            {
+                return null;
+            }
+
+
+            var responseCommandStr = _containerInterfaces.ResponseHandler.GetResponse(_user.Client);
+            var responserComand = new GetResponseFactory().GetResponse(responseCommandStr);
+            return responserComand;
+        } 
 
         public string GetAllChats()
         {
@@ -37,7 +59,7 @@ namespace KashkeshetClient.ServersHandler
             return responserStr;
         }
 
-        public List<ChatMessageModel> GetAllChatGroupModels() 
+        public List<ChatMessageModel> GetAllChatGroupModels()
         {
             var dataChat = new MainRequest { RequestType = MessageType.GetAllChats };
             string message = Utils.SerlizeObject(dataChat);
@@ -50,7 +72,7 @@ namespace KashkeshetClient.ServersHandler
 
         public string GetAllUserConnected()
         {
-            var dataChat = new MainRequest { RequestType = MessageType.GetAllUserConnected};
+            var dataChat = new MainRequest { RequestType = MessageType.GetAllUserConnected };
             string message = Utils.SerlizeObject(dataChat);
             _containerInterfaces.RequestHandler.SendData(_user.Client, message);
             var response = _containerInterfaces.ResponseHandler.GetResponse(_user.Client);
@@ -87,7 +109,7 @@ namespace KashkeshetClient.ServersHandler
             string data = _containerInterfaces.ResponseHandler.GetResponse(_user.Client);
 
             var responseStr = new GetResponseFactory().GetResponse(data);
-            if (responseStr == string.Empty) 
+            if (responseStr == string.Empty)
             {
                 return null;
             }
@@ -112,7 +134,7 @@ namespace KashkeshetClient.ServersHandler
             string data = _containerInterfaces.ResponseHandler.GetResponse(_user.Client);
             var successSwithChat = Utils.DeSerlizeObject<MainRequest>(data);
 
-            if (successSwithChat.RequestType == MessageType.ErrorResponse) 
+            if (successSwithChat.RequestType == MessageType.ErrorResponse)
             {
                 var error = Utils.DeSerlizeObject<ErrorMessage>(data);
                 Console.WriteLine(error.Error);
@@ -120,7 +142,7 @@ namespace KashkeshetClient.ServersHandler
             }
             var successChat = Utils.DeSerlizeObject<OkResponseMessage>(data);
 
-            
+
             if (allOldMessages != null)
             {
                 _containerInterfaces.SystemOutput.Print(allOldMessages);
@@ -138,16 +160,23 @@ namespace KashkeshetClient.ServersHandler
                 Console.WriteLine("Please enter message to send");
                 string inputMessage = Console.ReadLine();
                 Console.WriteLine($"You : {inputMessage}");
+
+
+
                 dataChat.MessageChat = inputMessage;
 
                 _containerInterfaces.RequestHandler.SendData(_user.Client, Utils.SerlizeObject(dataChat));
+
                 if (inputMessage == "exit")
                 {
                     break;
                 }
             }
-            
+
         }
+
+
+
         private void ListenAnswerTCP(TcpClient client)
         {
             while (true)
@@ -157,14 +186,14 @@ namespace KashkeshetClient.ServersHandler
                 if (response != null)
                 {
                     string responserStr = new GetResponseFactory().GetResponse(response);
-                    if (responserStr.Contains($"{_user.Name} sent : exit")) 
+                    if (responserStr.Contains($"{_user.Name} sent : exit"))
                     {
                         return;
                     }
                     Console.WriteLine(responserStr);
                 }
-                
-               
+
+
             }
         }
 
