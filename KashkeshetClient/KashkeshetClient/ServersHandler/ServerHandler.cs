@@ -157,9 +157,9 @@ namespace KashkeshetClient.ServersHandler
 
             while (true)
             {
-                Console.WriteLine("Please enter message to send");
-                string inputMessage = Console.ReadLine();
-                Console.WriteLine($"You : {inputMessage}");
+                _containerInterfaces.SystemOutput.Print("Please enter message to send | for exit press exit");
+                string inputMessage = _containerInterfaces.SystemInput.StringInput();
+                _containerInterfaces.SystemOutput.Print($"You : {inputMessage}");
 
 
 
@@ -190,7 +190,7 @@ namespace KashkeshetClient.ServersHandler
                     {
                         return;
                     }
-                    Console.WriteLine(responserStr);
+                    _containerInterfaces.SystemOutput.Print(responserStr);
                 }
 
 

@@ -27,7 +27,17 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions.ManagerOptions
         {
             var data = chatData as GroupChatMessageModel;
             var groupChat = _allChatDetails.GetGroupByName(data.GroupName);
-            
+
+            if (groupChat == null)
+            {
+                var errorBody = new ErrorMessage
+                {
+                    RequestType = MessageType.ErrorResponse,
+                    Error = $"There is not group chat with name {data.GroupName}"
+                };
+                _containerInterfaces.RequestHandler.SendData(_userClient.Client, Utils.SerlizeObject(errorBody));
+                return;
+            }
 
             var alClientsToRemove = data.lsUsers.Where(c => groupChat.IsClientExistInChat(_allChatDetails.GetClientByName(c))).Select(u => _allChatDetails.GetClientByName(u)).ToList();
             groupChat.RemoveMultiClients(alClientsToRemove);

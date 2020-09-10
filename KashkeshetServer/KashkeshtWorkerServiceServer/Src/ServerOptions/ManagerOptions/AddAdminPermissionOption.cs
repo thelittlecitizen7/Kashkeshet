@@ -30,6 +30,19 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions.ManagerOptions
             var data = chatData as GroupChatMessageModel;
             var groupChat = _allChatDetails.GetGroupByName(data.GroupName);
 
+            if (groupChat == null)
+            {
+                var errorBody = new ErrorMessage
+                {
+                    RequestType = MessageType.ErrorResponse,
+                    Error = $"There is not group chat with name {data.GroupName}"
+                };
+                _containerInterfaces.RequestHandler.SendData(_userClient.Client, Utils.SerlizeObject(errorBody));
+                return;
+            }
+
+
+
             if (!groupChat.IsClientManager(_userClient))
             {
                 var errorBody = new ErrorMessage
