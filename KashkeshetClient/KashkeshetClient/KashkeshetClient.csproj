@@ -16,7 +16,7 @@
       <HintPath>..\..\KashkeshetCommon\KashkeshetCommon\bin\Debug\netcoreapp3.1\KashkeshetCommon.dll</HintPath>
     </Reference>
     <Reference Include="MenuBuilder">
-      <HintPath>..\..\..\..\Desktop\MenuBuilder.dll</HintPath>
+      <HintPath>..\..\..\MenuBuilder.dll</HintPath>
     </Reference>
   </ItemGroup>
 
