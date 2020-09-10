@@ -1,4 +1,5 @@
 ﻿using KashkeshetCommon.Enum;
+using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
 {
     public class ChatModule
     {
-        public List<ClientModel> Clients { get; set; }
+        public List<IClientModel> Clients { get; set; }
 
         public List<MessageModel> Messages { get; set; }
 
@@ -19,17 +20,17 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
         public ChatModule(ChatType chatType)
         {
             ChatId = Guid.NewGuid().ToString();
-            Clients = new List<ClientModel>();
+            Clients = new List<IClientModel>();
             Messages = new List<MessageModel>();
             ChatType = chatType;
         }
 
-        public ClientModel GetClient(string name)
+        public IClientModel GetClient(string name)
         {
             return Clients.FirstOrDefault(c => c.Name == name);
         }
 
-        public void AddClient(ClientModel client)
+        public void AddClient(IClientModel client)
         {
             if (!IsClientExistInChat(client))
             {
@@ -49,7 +50,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
         }
 
 
-        public virtual void RemoveClient(ClientModel client)
+        public virtual void RemoveClient(IClientModel client)
         {
             if (IsClientExistInChat(client))
             {
@@ -57,7 +58,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
             }
         }
 
-        public virtual void RemoveMultiClients(List<ClientModel> clients)
+        public virtual void RemoveMultiClients(List<IClientModel> clients)
         {
             foreach (var client in clients)
             {
@@ -66,7 +67,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
         }
 
 
-        public bool IsClientExistInChat(ClientModel client)
+        public bool IsClientExistInChat(IClientModel client)
         {
             return Clients.Any(c => c.Name == client.Name);
         }

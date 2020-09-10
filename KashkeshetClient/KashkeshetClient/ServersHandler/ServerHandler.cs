@@ -14,14 +14,12 @@ namespace KashkeshetClient.ServersHandler
 {
     public class ServerHandler
     {
-
-        private GetResponseFactory _getResponseFactory;
         private IUser _user;
 
         private IContainerInterfaces _containerInterfaces;
         public ServerHandler(IContainerInterfaces containerInterfaces,IUser user)
         {
-            _getResponseFactory = new GetResponseFactory();
+            
             _containerInterfaces = containerInterfaces;
             _user = user;
         }
@@ -76,8 +74,31 @@ namespace KashkeshetClient.ServersHandler
             Console.WriteLine(responserStr);
         }
 
+        public string GetAllOldMessages(string chatId)
+        {
+            var oldMessages = new ChatMessageHistory
+            {
+                RequestType = MessageType.HistoryChatMessages,
+                ChatId = chatId,
+                From = _user.Name
+            };
+            string oldMessagesStr = Utils.SerlizeObject(oldMessages);
+            _containerInterfaces.RequestHandler.SendData(_user.Client, oldMessagesStr);
+            string data = _containerInterfaces.ResponseHandler.GetResponse(_user.Client);
+
+            var responseStr = new GetResponseFactory().GetResponse(data);
+            if (responseStr == string.Empty) 
+            {
+                return null;
+            }
+            return responseStr;
+
+        }
+
+
         public void InsertToChat(string chatId)
         {
+            var allOldMessages = GetAllOldMessages(chatId);
             var dataChat = new InsertToChatMessageModel
             {
                 RequestType = MessageType.InsertToChat,
@@ -98,7 +119,16 @@ namespace KashkeshetClient.ServersHandler
                 return;
             }
             var successChat = Utils.DeSerlizeObject<OkResponseMessage>(data);
+
+            
+            if (allOldMessages != null)
+            {
+                _containerInterfaces.SystemOutput.Print(allOldMessages);
+            }
+
+
             Console.WriteLine(successChat.Message);
+
 
             Thread thread = new Thread(() => { ListenAnswerTCP(_user.Client); });
             thread.Start();

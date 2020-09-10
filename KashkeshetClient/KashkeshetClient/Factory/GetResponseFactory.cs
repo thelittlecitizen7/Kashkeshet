@@ -4,6 +4,7 @@ using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace KashkeshetClient.Factory
@@ -12,7 +13,9 @@ namespace KashkeshetClient.Factory
     {
         public string GetResponse(string response)
         {
+
             var obj = Utils.DeSerlizeObject<MainRequest>(response);
+            Console.WriteLine(obj.RequestType);
             switch (obj.RequestType)
             {
                 case MessageType.NewChatMessage:
@@ -35,11 +38,15 @@ namespace KashkeshetClient.Factory
                 case MessageType.ErrorResponse:
                     var errorResponse = Utils.DeSerlizeObject<ErrorMessage>(response);
                     return $"request Failed : {errorResponse.Error}";
+                case MessageType.HistoryChatMessages:
+
+                    var chatMessageHistory = Utils.DeSerlizeObject<ChatMessageHistory>(response);
+                    string msg = "";
+                    chatMessageHistory.AllMessages.ToList().ForEach(m => msg += $"{m.Datetime.ToString("MM/dd/yyyy")} : {m.SenderName} sent : {m.Message} {Environment.NewLine}");
+                    return msg;
                 default:
                     return null;
             }
         }
-
-      
     }
 }

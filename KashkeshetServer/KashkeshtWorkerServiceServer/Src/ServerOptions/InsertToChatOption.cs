@@ -3,6 +3,7 @@ using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
+using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
 using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
 using System;
@@ -15,13 +16,11 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
     {
         private object locker = new object();
         private AllChatDetails _allChatDetails { get; set; }
-        private IServerRequestHandler _requestHandler;
-        private IServerResponseHandler _responseHandler;
 
-        public InsertToChatOption(AllChatDetails allChatDetails)
+        public IContainerInterfaces _containerInterfaces { get; set; }
+        public InsertToChatOption(AllChatDetails allChatDetails , IContainerInterfaces containerInterfaces)
         {
-            _requestHandler = new ServerRequestHandler();
-            _responseHandler = new ServerResponseHandler();
+            _containerInterfaces = containerInterfaces;
             _allChatDetails = allChatDetails;
         }
 
@@ -60,7 +59,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                 };
                 string message = Utils.SerlizeObject(model);
                 if (data.MessageChat == "exit")
-                {
+                {   
                     ExitFromChat(clientSneder, chat, request);
                     return;
                 }
@@ -68,16 +67,15 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                 SendToAll(chat, request, message);
 
 
-                chat.AddMessage(new MessageModel(ChatMessageType.TextMessage, message, clientSneder, DateTime.Now));
+                chat.AddMessage(new MessageModel(ChatMessageType.TextMessage, data.MessageChat, clientSneder, DateTime.Now));
             }
             catch (Exception e)
             {
                 ExitFromChat(clientSneder, chat, request);
-                Console.WriteLine("Error" + e.Message);
             }
         }
 
-        private bool ValidateFirstConnectionToChat(ClientModel clientSneder,ChatModule chat, InsertToChatMessageModel data)
+        private bool ValidateFirstConnectionToChat(IClientModel clientSneder,ChatModule chat, InsertToChatMessageModel data)
         {
             if (clientSneder.CurrentConnectChat == null)
             {
@@ -88,7 +86,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                         RequestType = MessageType.ErrorResponse,
                         Error = $"There is not chat with id {data.ChatId}"
                     };
-                    _requestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(errorBody));
+                    _containerInterfaces.RequestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(errorBody));
                     return false;
                 }
                 else
@@ -98,14 +96,14 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                         RequestType = MessageType.SuccessResponse,
                         Message = $"user {data.From} in chat with {data.ChatId}"
                     };
-                    _requestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(successBody));
+                    _containerInterfaces.RequestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(successBody));
                     return true;
                 }
             }
             return true;
         }
 
-        private void ExitFromChat(ClientModel clientSneder, ChatModule chat, MainRequest request)
+        private void ExitFromChat(IClientModel clientSneder, ChatModule chat, MainRequest request)
         {
             lock (locker)
             {
@@ -118,9 +116,11 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             };
 
             model.Message = $"The user {clientSneder.Name} disconnect from server";
+            chat.AddMessage(new MessageModel(ChatMessageType.TextMessage, model.Message, clientSneder, DateTime.Now));
             SendToAll(chat, request, Utils.SerlizeObject(model));
             model.Message = $"exit";
-            _requestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(model));
+            chat.AddMessage(new MessageModel(ChatMessageType.TextMessage, model.Message, clientSneder, DateTime.Now));
+            _containerInterfaces.RequestHandler.SendData(clientSneder.Client, Utils.SerlizeObject(model));
         }
 
 
@@ -128,14 +128,14 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
         {
 
             var allUserToSend = GetAllConnectedToSend(chat, request);
-            _requestHandler.SendDataMultiClients(allUserToSend.Select(u => u.Client).ToList(),message);
+            _containerInterfaces.RequestHandler.SendDataMultiClients(allUserToSend.Select(u => u.Client).ToList(),message);
         }
 
 
-        private List<ClientModel> GetAllConnectedToSend(ChatModule chat, MainRequest requestData)
+        private List<IClientModel> GetAllConnectedToSend(ChatModule chat, MainRequest requestData)
         {
             var request = requestData as InsertToChatMessageModel;
-            List<ClientModel> ls = new List<ClientModel>();
+            List<IClientModel> ls = new List<IClientModel>();
             foreach (var client in chat.Clients)
             {
                 if ((client.Name != request.From) && (client.Connected == true))

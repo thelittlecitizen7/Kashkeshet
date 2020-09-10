@@ -2,6 +2,7 @@
 using KashkeshetCommon.Enum;
 using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
+using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
 using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
 using System.Collections.Generic;
@@ -13,17 +14,15 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
     {
         private AllChatDetails _allChatDetails { get; set; }
 
-        private IServerRequestHandler _requestHandler;
-        private IServerResponseHandler _responseHandler;
+        private IContainerInterfaces _containerInterfaces;
 
-        private string _name;
+        private IClientModel _userClient;
 
-        public GetAllUserConnectedOption(string name, AllChatDetails allChatDetails)
+        public GetAllUserConnectedOption(IClientModel userClient, AllChatDetails allChatDetails , IContainerInterfaces containerInterfaces)
         {
-            _requestHandler = new ServerRequestHandler();
-            _responseHandler = new ServerResponseHandler();
+            _containerInterfaces = containerInterfaces;
             _allChatDetails = allChatDetails;
-            _name = name;
+            _userClient = userClient;
         }
 
         public void Operation(MainRequest chatData)
@@ -31,13 +30,13 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             List<string> ls = _allChatDetails.GetAllUsers().Select(u => u.Name).ToList();
             var body = new AllUsersMessage
             { 
-                From = _name,
+                From = _userClient.Name,
                 RequestType = MessageType.GetAllUserConnected,
                 Names = ls
             };
-            var client = _allChatDetails.GetClientByName(_name).Client;
+            var client = _allChatDetails.GetClientByName(_userClient.Name).Client;
             string message = Utils.SerlizeObject(body);
-            _requestHandler.SendData(client, message);
+            _containerInterfaces.RequestHandler.SendData(client, message);
         }
     }
 }

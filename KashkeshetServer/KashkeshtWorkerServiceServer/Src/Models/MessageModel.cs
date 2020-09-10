@@ -1,5 +1,6 @@
 ﻿using KashkeshetCommon.Enum;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
+using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,10 +13,10 @@ namespace KashkeshtWorkerServiceServer.Src.Models
 
         public string Message { get; set; }
 
-        public ClientModel ClientSender { get; set; }
+        public IClientModel ClientSender { get; set; }
 
         public DateTime DateSended { get; set; }
-        public MessageModel(ChatMessageType messageType, string message, ClientModel clientSender, DateTime dateSended)
+        public MessageModel(ChatMessageType messageType, string message, IClientModel clientSender, DateTime dateSended)
         {
             MessageType = messageType;
             Message = message;

@@ -15,8 +15,9 @@ namespace ClientChat
             lock (locker)
             {
                 NetworkStream nts = client.GetStream();
-                byte[] tmpBuff = new byte[1024];
-                int readOut = nts.Read(tmpBuff, 0, 1024);
+                
+                byte[] tmpBuff = new byte[client.ReceiveBufferSize];
+                int readOut = nts.Read(tmpBuff, 0, client.ReceiveBufferSize);
                 if (readOut > 0)
                 {
                     return Encoding.ASCII.GetString(tmpBuff, 0, readOut);

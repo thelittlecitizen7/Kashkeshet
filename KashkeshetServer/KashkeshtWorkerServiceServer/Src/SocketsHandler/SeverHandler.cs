@@ -2,8 +2,10 @@
 using KashkeshtWorkerServiceServer.Src.Factory;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
+using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using KashkeshtWorkerServiceServer.Src.RequestsHandler;
 using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +19,17 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 
         private TcpClient _client;
 
-        private IServerRequestHandler _requestHandler;
-        private IServerResponseHandler _responseHandler;
-
-        private ClientModel _userClient { get; set; }
+        private IClientModel _userClient { get; set; }
 
         private AllChatDetails _allChatDetails;
 
-        public SeverHandler(TcpClient client, AllChatDetails allChatDetails)
+        private IContainerInterfaces _containerInterfaces;
+
+        public SeverHandler(TcpClient client, AllChatDetails allChatDetails , IContainerInterfaces containerInterfaces)
         {
             _allChatDetails = allChatDetails;
             _client = client;
-            _requestHandler = new ServerRequestHandler();
-            _responseHandler = new ServerResponseHandler();
+            _containerInterfaces = containerInterfaces;
         }
         public void Run()
         {
@@ -45,7 +45,7 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 
         private void StartClientConnection()
         {
-            string name = _responseHandler.GetResponse(_client);
+            string name = _containerInterfaces.ResponseHandler.GetResponse(_client);
 
             if (!_allChatDetails.IsClientExist(name))
             {
@@ -59,7 +59,7 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
             {
                 _userClient = _allChatDetails.GetClientByName(name);
             }
-            Console.WriteLine($"Client with name : {name} connected to server");
+            _containerInterfaces.Logger.LogInformation($"Client with name : {name} connected to server");
 
             _userClient.Client = _client;
             _userClient.Connected = true;
@@ -72,13 +72,13 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
             {
                 try
                 {
-                    string data = _responseHandler.GetResponse(_client);
+                    string data = _containerInterfaces.ResponseHandler.GetResponse(_client);
 
-                    OperationExecuteFactory operationExecuteFactory = new OperationExecuteFactory(_userClient.Name, _allChatDetails);
+                    OperationExecuteFactory operationExecuteFactory = new OperationExecuteFactory(_userClient, _allChatDetails,_containerInterfaces);
 
                     operationExecuteFactory.Execute(data);
 
-                    Console.WriteLine($"Received from {_userClient.Name}: " + data);
+                    _containerInterfaces.Logger.LogInformation($"Received from {_userClient.Name}: " + data);
 
                     if (data == "Close")
                     {

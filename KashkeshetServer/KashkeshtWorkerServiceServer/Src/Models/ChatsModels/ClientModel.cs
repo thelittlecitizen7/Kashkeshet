@@ -1,11 +1,12 @@
-﻿using System;
+﻿using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
 namespace KashkeshtWorkerServiceServer.Src.Models.ChatModel
 {
-    public class ClientModel
+    public class ClientModel : IClientModel
     {
         public string Name { get; set; }
 

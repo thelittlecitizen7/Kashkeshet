@@ -1,5 +1,6 @@
 ﻿using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Sockets;
 using System.Threading;
@@ -15,8 +16,11 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
 
         public AllChatDetails AllChatDetails { get; set; }
 
-        public ServerSocket(int port)
+        private IContainerInterfaces _containerInterfaces;
+
+        public ServerSocket(int port , IContainerInterfaces containerInterfaces)
         {
+            _containerInterfaces = containerInterfaces;
             _globalChatModel = new GlobalChat();
             AllChatDetails = new AllChatDetails();
             AllChatDetails.AddChat(_globalChatModel);
@@ -36,14 +40,14 @@ namespace KashkeshtWorkerServiceServer.Src.SocketsHandler
             try
             {
                 Listener.Start();
-                Console.WriteLine("Server Start listen");
+                _containerInterfaces.Logger.LogInformation("Server Start listen");
                 while (true)
                 {
                     
                     Thread thread = new Thread(() =>
                     {
                         TcpClient client = Listener.AcceptTcpClient();
-                        SeverHandler socketHandler = new SeverHandler(client, AllChatDetails);
+                        SeverHandler socketHandler = new SeverHandler(client, AllChatDetails,_containerInterfaces);
                         socketHandler.Run();
                     });
                     thread.Start();

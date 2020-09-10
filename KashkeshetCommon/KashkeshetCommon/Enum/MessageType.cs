@@ -20,6 +20,7 @@ namespace KashkeshetCommon.Enum
         NewChatMessage,
         UserStatus,
         SuccessResponse,
-        ErrorResponse
+        ErrorResponse,
+        HistoryChatMessages
     }
 }

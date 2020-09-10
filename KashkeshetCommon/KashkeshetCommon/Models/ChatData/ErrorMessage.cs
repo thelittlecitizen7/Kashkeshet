@@ -10,5 +10,6 @@ namespace KashkeshetCommon.Models.ChatData
     {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Error { get; set; }
+
     }
 }

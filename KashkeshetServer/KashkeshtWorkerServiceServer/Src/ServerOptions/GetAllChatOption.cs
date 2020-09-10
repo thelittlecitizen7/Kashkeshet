@@ -14,17 +14,17 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
     {
         private AllChatDetails _allChatDetails { get; set; }
 
-        private IServerRequestHandler _requestHandler;
-        private IServerResponseHandler _responseHandler;
 
-        private string _name;
+        private IClientModel _userClient { get; set; }
 
-        public GetAllChatOption(string name, AllChatDetails allChatDetails)
+        private IContainerInterfaces _containerInterfaces;
+
+        public GetAllChatOption(IClientModel userClient, AllChatDetails allChatDetails , IContainerInterfaces containerInterfaces)
         {
-            _requestHandler = new ServerRequestHandler();
-            _responseHandler = new ServerResponseHandler();
+            _containerInterfaces = containerInterfaces;
             _allChatDetails = allChatDetails;
-            _name = name;
+            _userClient = userClient;
+            
         }
 
         public void Operation(MainRequest request)
@@ -34,7 +34,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                 RequestType = MessageType.GetAllChats,
                 Chats = new List<ChatMessageModel>()
             };
-            var allChats = _allChatDetails.GetAllChatThatClientExist(_name);
+            var allChats = _allChatDetails.GetAllChatThatClientExist(_userClient.Name);
             foreach (var chat in allChats)
             {
                 allChatsMessageModel.Chats.Add(new ChatMessageModel
@@ -47,7 +47,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
                 });
             }
             string msg = Utils.SerlizeObject(allChatsMessageModel);
-            _requestHandler.SendData(_allChatDetails.GetClientByName(_name).Client, msg);
+            _containerInterfaces.RequestHandler.SendData(_userClient.Client, msg);
         }
     }
 }

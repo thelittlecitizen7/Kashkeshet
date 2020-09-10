@@ -12,12 +12,12 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
         public string GroupName { get; set; }
         public string ChatName { get; set; }
 
-        public List<ClientModel> Managers { get; set; }
+        public List<IClientModel> Managers { get; set; }
 
         public GroupChat(string groupName) : base(ChatType.Group)
         {
             GroupName = groupName;
-            Managers = new List<ClientModel>();
+            Managers = new List<IClientModel>();
         }
 
         public List<string> GetAllManagersNames() 
@@ -25,7 +25,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             return Managers.Select(m => m.Name).ToList();
         }
 
-        public void AddMultiClient(List<ClientModel> clients)
+        public void AddMultiClient(List<IClientModel> clients)
         {
             foreach (var client in clients)
             {
@@ -38,12 +38,12 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             GroupName = groupName;
         }
 
-        public bool IsClientManager(ClientModel client) 
+        public bool IsClientManager(IClientModel client) 
         {
             return Managers.Any(m => m.Name == client.Name && base.IsClientExistInChat(client));
         }
 
-        public void AddManager(ClientModel client) 
+        public void AddManager(IClientModel client) 
         {
             if (!IsClientManager(client)) 
             {
@@ -51,7 +51,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             }
         }
 
-        public void AddMultiManagrs(List<ClientModel> clients) 
+        public void AddMultiManagrs(List<IClientModel> clients) 
         {
             foreach (var client in clients)
             {
@@ -59,7 +59,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             }
         }
 
-        public void RemoveManager(ClientModel client)
+        public void RemoveManager(IClientModel client)
         {
             if (IsClientManager(client))
             {
@@ -68,7 +68,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
         }
 
 
-        public void RemoveMultiManagrs(List<ClientModel> clients)
+        public void RemoveMultiManagrs(List<IClientModel> clients)
         {
             foreach (var client in clients)
             {
@@ -76,7 +76,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             }
         }
 
-        public override void RemoveClient(ClientModel client)
+        public override void RemoveClient(IClientModel client)
         {
             if (IsClientExistInChat(client))
             {
@@ -85,7 +85,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models.ChatsModels
             }
         }
 
-        public override void RemoveMultiClients(List<ClientModel> clients)
+        public override void RemoveMultiClients(List<IClientModel> clients)
         {
             foreach (var client in clients)
             {

@@ -10,15 +10,15 @@ namespace KashkeshtWorkerServiceServer.Src.Models
     {
         public List<ChatModule> AllChats { get; set; }
 
-        public List<ClientModel> AllClients { get; set; }
+        public List<IClientModel> AllClients { get; set; }
         
         public AllChatDetails()
         {
             AllChats = new List<ChatModule>();
-            AllClients = new List<ClientModel>();
+            AllClients = new List<IClientModel>();
         }
 
-        public bool IsExistChatWithSamePeaple(List<ClientModel> users,ChatType chatType) 
+        public bool IsExistChatWithSamePeaple(List<IClientModel> users,ChatType chatType) 
         {
             var allChats = AllChats.Where(c => c.ChatType == chatType).ToList();
             if (allChats.Count() == 0) 
@@ -57,7 +57,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models
             return AllClients.Any(c => c.Name == name);
         }
 
-        public void UpdateCurrentChat(ClientModel clientModel,ChatModule chat) 
+        public void UpdateCurrentChat(IClientModel clientModel,ChatModule chat) 
         {
             var clientFromClients = GetClientByName(clientModel.Name);
             var clientFromChat = GetClientByNameFromChat(clientModel.Name);
@@ -79,7 +79,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models
             return AllChats.FirstOrDefault(chat => chat.ChatId == chatId);
         }
 
-        public List<ClientModel> GetAllUsers() 
+        public List<IClientModel> GetAllUsers() 
         {
             return AllClients;
         }
@@ -95,12 +95,12 @@ namespace KashkeshtWorkerServiceServer.Src.Models
             return AllChats.Where(c => c.ChatType == chatType).ToList();
         }
 
-        public ClientModel GetClientByName(string name) 
+        public IClientModel GetClientByName(string name) 
         {
             return AllClients.FirstOrDefault(c => c.Name == name);
         }
 
-        public ClientModel GetClientByNameFromChat(string name)
+        public IClientModel GetClientByNameFromChat(string name)
         {
             foreach (var chat in AllChats)
             {
@@ -115,14 +115,9 @@ namespace KashkeshtWorkerServiceServer.Src.Models
             return null;
         }
 
-        public void AddClient(ClientModel client) 
+        public void AddClient(IClientModel client) 
         {
             AllClients.Add(client);
-        }
-
-        public void RemoveClient(ClientModel client)
-        {
-            AllClients.Remove(client);
         }
 
         public void AddChat(ChatModule chat) 
@@ -130,9 +125,7 @@ namespace KashkeshtWorkerServiceServer.Src.Models
             AllChats.Add(chat);
         }
 
-        public void RemoveChat(ChatModule chat)
-        {
-            AllChats.Remove(chat);
-        }
+
+        
     }
 }

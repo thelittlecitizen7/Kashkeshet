@@ -2,6 +2,7 @@
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
 using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
@@ -11,10 +12,14 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
     {
         private AllChatDetails _allChatDetails;
 
-        private string Name { get; set; }
-        public GroupChatCreatorOption(string name, AllChatDetails allChatDetails)
+        private IClientModel _userClient;
+
+        private IContainerInterfaces _containerInterfaces;
+        public GroupChatCreatorOption(IClientModel userClient, AllChatDetails allChatDetails , IContainerInterfaces containerInterfaces)
         {
-            Name = name;
+            _userClient = userClient;
+            _containerInterfaces = containerInterfaces;
+            
             _allChatDetails = allChatDetails;
         }
 
@@ -23,21 +28,20 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
         {
            var data =  chatData as GroupChatMessageModel;
             GroupChat newGroupChat = new GroupChat(data.GroupName);
-            ClientModel senerClient = _allChatDetails.GetClientByName(Name);
             
-            List<ClientModel> clients = new List<ClientModel>();
-            clients.Add(senerClient);
+            List<IClientModel> clients = new List<IClientModel>();
+            clients.Add(_userClient);
             if (data.lsUsers.Count ==  0) 
             {
                 return;
             }
-            newGroupChat.AddManager(senerClient);
-            newGroupChat.AddClient(senerClient);
+            newGroupChat.AddManager(_userClient);
+            newGroupChat.AddClient(_userClient);
             foreach (var clientName in data.lsUsers)
             {
                 if (_allChatDetails.IsClientExist(clientName))
                 {
-                    ClientModel client = _allChatDetails.GetClientByName(clientName);
+                    IClientModel client = _allChatDetails.GetClientByName(clientName);
                     clients.Add(client);
                     newGroupChat.AddClient(client);
                 }
@@ -46,7 +50,7 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
             if (!_allChatDetails.IsExistChatWithName(data.GroupName)) 
             {
                 _allChatDetails.AddChat(newGroupChat);
-                Console.WriteLine($"Group {data.GroupName} added");
+                _containerInterfaces.Logger.LogInformation($"Group {data.GroupName} added");
             }
         }
     }

@@ -2,6 +2,7 @@
 using KashkeshetCommon.Models.ChatData;
 using KashkeshtWorkerServiceServer.Src.Models;
 using KashkeshtWorkerServiceServer.Src.Models.ChatModel;
+using KashkeshtWorkerServiceServer.Src.Models.ChatsModels;
 using System.Collections.Generic;
 
 namespace KashkeshtWorkerServiceServer.Src.ServerOptions
@@ -10,10 +11,11 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
     {
         private AllChatDetails _allChatDetails;
 
-        private string Name { get; set; }
-        public PrivateChatCreatorOption(string name, AllChatDetails allChatDetails)
+        private IClientModel _userClient { get; set; }
+
+        public PrivateChatCreatorOption(IClientModel userClient, AllChatDetails allChatDetails)
         {
-            Name = name;
+            _userClient = userClient;
             _allChatDetails = allChatDetails;
         }
 
@@ -22,17 +24,16 @@ namespace KashkeshtWorkerServiceServer.Src.ServerOptions
         {
             var data = chatData as PrivateChatMessageModel;
             ChatModule newChat = new PrivateChat();
-            ClientModel senerClient = _allChatDetails.GetClientByName(Name);
-            newChat.AddClient(senerClient);
+            newChat.AddClient(_userClient);
 
-            List<ClientModel> clients = new List<ClientModel>();
-            clients.Add(senerClient);
+            List<IClientModel> clients = new List<IClientModel>();
+            clients.Add(_userClient);
 
             foreach (var clientName in data.lsUsers)
             {
                 if (_allChatDetails.IsClientExist(clientName))
                 {
-                    ClientModel client = _allChatDetails.GetClientByName(clientName);
+                    IClientModel client = _allChatDetails.GetClientByName(clientName);
                     clients.Add(client);
                     newChat.AddClient(client);
                 }

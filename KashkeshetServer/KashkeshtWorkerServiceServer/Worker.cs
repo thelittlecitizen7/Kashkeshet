@@ -1,6 +1,10 @@
+using KashkeshtWorkerServiceServer.Src.Models;
+using KashkeshtWorkerServiceServer.Src.RequestsHandler;
+using KashkeshtWorkerServiceServer.Src.ResponsesHandler;
 using KashkeshtWorkerServiceServer.Src.SocketsHandler;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +21,12 @@ namespace KashkeshtWorkerServiceServer
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            ServerSocket serverSocket = new ServerSocket(11111);
+            IServerRequestHandler requestHandler = new ServerRequestHandler();
+            IServerResponseHandler responseHandler = new ServerResponseHandler();
+
+
+            IContainerInterfaces containerInterfaces = new ContainerInterfaces(requestHandler,responseHandler,_logger);
+            ServerSocket serverSocket = new ServerSocket(11111, containerInterfaces);
             serverSocket.Listen();
            
         }
