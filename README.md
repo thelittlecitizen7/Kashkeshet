@@ -1,2 +1,6 @@
-1. הפרוייקט של ה Client משתמש ב dll של ה MenuBuilder .
-2. ה Client וה Server משתמשים בפרוייקט Common כ dll .
+
+         Kashkeshet project:
+
+1. the KashkeshetClient project use the MenuBuilder.dll and use the project KashkeshetCommon
+
+2. the KashkeshetServer use the project KashkeshetCommon
